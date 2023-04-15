@@ -17,7 +17,7 @@ spec:
       containers:
       - name: dns-func-test
         image: emirozbir/dns-func-test:0.0.1
-
+        imagePullPolicy: Always
         volumeMounts:
           - name: mnt
             mountPath: /app/hosts.txt

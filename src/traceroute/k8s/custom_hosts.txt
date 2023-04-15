@@ -1,0 +1,3 @@
+hosts:
+  - www.google.com
+  - www.youtube.com

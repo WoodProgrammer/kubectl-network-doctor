@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: traceroute-test-deployment
+  labels:
+    app: traceroute-test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: traceroute-test
+  template:
+    metadata:
+      labels:
+        app: traceroute-test
+    spec:
+      containers:
+      - name: traceroute-test
+        image: emirozbir/traceroute-test:0.0.1
+        imagePullPolicy: Always
+        volumeMounts:
+          - name: mnt
+            mountPath: /opt/traceroute/custom_hosts.txt
+            subPath: custom_hosts.txt
+      volumes:
+      - name: mnt
+        configMap:
+          name: traceroute-test-cm
+          items:
+          - key: custom_hosts.txt
+            path: custom_hosts.txt
