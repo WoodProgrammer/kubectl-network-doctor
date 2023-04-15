@@ -13,7 +13,7 @@ echo "$yellow 3-) CoreDNS Pods TCPDump"
 
 checkDNSResolution(){
 	echo "$yellow This manifests use default values in hosts.txt.You can speficy extra hosts."
-	kubectl -n ${CORE_DNS_NAMESPACE} apply -f manifests  2>/dev/null 
+	kubectl -n ${CORE_DNS_NAMESPACE} apply -f src/dns/k8s/manifests  2>/dev/null 
 }
 
 checkCoreDnsLogs(){
@@ -43,6 +43,14 @@ getTcpDump(){
 	done
 }
 
+checkTraceRoute(){
+	kubectl -n ${CORE_DNS_NAMESPACE} apply -f src/traceroute/k8s/manifests  2>/dev/null
+	kubectl wait --for=condition=Ready -l app=traceroute-test
+	kubectl logs -f -l app=traceroute-test
+}
+
 checkCoreDnsLogs
 checkCoreDnsPods
+checkTraceRoute
+checkDNSResolution
 getTcpDump
