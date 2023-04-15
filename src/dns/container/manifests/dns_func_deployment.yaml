@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dns-func-test-deployment
+  labels:
+    app: dns-func-test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dns-func-test
+  template:
+    metadata:
+      labels:
+        app: dns-func-test
+    spec:
+      containers:
+      - name: dns-func-test
+        image: emirozbir/dns-func-test:0.0.1
+
+        volumeMounts:
+          - name: mnt
+            mountPath: /app/hosts.txt
+            subPath: hosts.txt
+      volumes:
+      - name: mnt
+        configMap:
+          name: dns-func-test-cm
