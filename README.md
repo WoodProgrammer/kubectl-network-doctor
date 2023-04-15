@@ -18,9 +18,9 @@ The problems that covered by this plugin;
 
 * TCP/IP
     - [x] Pcap dump 
+    - [x] traceroute outputs
     - Direct analysis based on bpf rules.
 
-* pod-to-pod communication (based on topology keys or labels)
-* node-to-node communication
-* node network configuration
-* traceroute outputs
+    * pod-to-pod communication (based on topology keys or labels)
+    * node-to-node communication
+    * node network configuration
