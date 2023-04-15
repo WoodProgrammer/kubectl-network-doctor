@@ -11,6 +11,11 @@ echo "$yellow 1-) CoreDNS Logs"
 echo "$yellow 2-) CoreDNS Pods Health Status"
 echo "$yellow 3-) CoreDNS Pods TCPDump"
 
+checkDNSResolution(){
+	echo "$yellow This manifests use default values in hosts.txt.You can speficy extra hosts."
+	kubectl -n ${CORE_DNS_NAMESPACE} apply -f manifests  2>/dev/null 
+}
+
 checkCoreDnsLogs(){
 	kubectl -n ${CORE_DNS_NAMESPACE} logs -l k8s-app=kube-dns  2>/dev/null 
 }
