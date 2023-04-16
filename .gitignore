@@ -14,6 +14,7 @@
 *tcpdump-coredns
 # Test binary, built with `go test -c`
 *.test
+hosts
 
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out

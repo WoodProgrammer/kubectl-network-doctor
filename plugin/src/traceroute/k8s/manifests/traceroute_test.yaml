@@ -20,12 +20,12 @@ spec:
         imagePullPolicy: Always
         volumeMounts:
           - name: mnt
-            mountPath: /opt/traceroute/custom_hosts.txt
-            subPath: custom_hosts.txt
+            mountPath: /opt/traceroute/hosts.txt
+            subPath: hosts.txt
       volumes:
       - name: mnt
         configMap:
           name: traceroute-test-cm
           items:
-          - key: custom_hosts.txt
-            path: custom_hosts.txt
+          - key: hosts.txt
+            path: hosts.txt
