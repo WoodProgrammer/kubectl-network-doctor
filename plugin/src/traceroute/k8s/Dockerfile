@@ -1,6 +1,8 @@
 FROM debian:bullseye-slim
+
 WORKDIR /opt/traceroute
-COPY main.sh .
+
+COPY bin/main.sh .
 
 RUN apt-get update && apt-get install -y \
     traceroute wget \
