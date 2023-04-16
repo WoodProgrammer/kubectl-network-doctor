@@ -1,7 +1,7 @@
 #!/bin/bash
 ## TODO: traceroute args and options
 set -e
-export ADDRESSES=$(yq e .hosts[] custom_hosts.txt)
+export ADDRESSES=$(cat hosts.txt)
 yellow=$(tput setaf 3 || true)
 
 traceRoute(){
