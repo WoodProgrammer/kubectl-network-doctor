@@ -21,6 +21,7 @@ cecho(){
 
 cecho "RED" "Kubectl Network Doctor 0.0.1 is a triage plugin that we are using to get system dump of the essential network components"
 cecho "RED" "This is demo version"
+sleep 4
 
 checkDNSResolution(){
 	cecho "BLUE" "####### Checking DNS Resolution #########"
@@ -55,6 +56,7 @@ checkCoreDnsPods(){
 	 	-o jsonpath='{range .items[*]}{.status.containerStatuses[*].ready.true}{.metadata.name}{ "\n"}{end}'
 
 	kubectl -n ${CORE_DNS_NAMESPACE} get deployment  |grep coredns
+
 	cecho "RED" "###########################"
 
 }
