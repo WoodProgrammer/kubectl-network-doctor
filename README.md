@@ -2,7 +2,6 @@
 
 This is a kubectl plugin it basically shows the network problems like;
 
-
 # Concepts and Goals
 The problems that covered by this plugin;
 
@@ -21,6 +20,7 @@ The problems that covered by this plugin;
     - [x] traceroute outputs
     - Direct analysis based on bpf rules.
 
+* TODO
     * pod-to-pod communication (based on topology keys or labels)
     * node-to-node communication
     * node network configuration

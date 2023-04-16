@@ -1,23 +1,26 @@
 #!/bin/bash
-set -eou pipefail
+
 [[ -n $DEBUG ]] && set -x
+set -eou pipefail
 
 export CORE_DNS_NAMESPACE="${1:-kube-system}"
-yellow=$(tput setaf 3 || true)
 
 echo "This script runs tests on coredns"
 
-echo "$yellow 1-) CoreDNS Logs"
-echo "$yellow 2-) CoreDNS Pods Health Status"
-echo "$yellow 3-) CoreDNS Pods TCPDump"
+echo "1-) CoreDNS Logs"
+echo "2-) CoreDNS Pods Health Status"
+echo "3-) CoreDNS Pods TCPDump"
 
 checkDNSResolution(){
-	echo "$yellow This manifests use default values in hosts.txt.You can speficy extra hosts."
+	echo " This manifests use default values in hosts.txt.You can speficy extra hosts."
 	kubectl -n ${CORE_DNS_NAMESPACE} apply -f src/dns/k8s/manifests  2>/dev/null 
+	
+	kubectl wait --for=condition=Ready pod -l app=dns-func-test --timeout=60s
+	kubectl logs -f -l app=dns-func-test
 }
 
 checkCoreDnsLogs(){
-	kubectl -n ${CORE_DNS_NAMESPACE} logs -l k8s-app=kube-dns  2>/dev/null 
+	kubectl  -n ${CORE_DNS_NAMESPACE} logs -l k8s-app=kube-dns --since=10m 2>/dev/null 
 }
 
 checkCoreDnsPods(){
@@ -45,12 +48,19 @@ getTcpDump(){
 
 checkTraceRoute(){
 	kubectl -n ${CORE_DNS_NAMESPACE} apply -f src/traceroute/k8s/manifests  2>/dev/null
-	kubectl wait --for=condition=Ready -l app=traceroute-test
-	kubectl logs -f -l app=traceroute-test
+	kubectl wait --for=condition=Ready pod -l app=traceroute-test --timeout=60s
+	kubectl logs -f -l app=traceroute-test 
+}
+
+tearDownDebugStack(){
+	echo "It is time to teardown entire stack"
+	kubectl delete -f src/traceroute/k8s/manifests
+	kubectl delete -f src/dns/k8s/manifests
 }
 
 checkCoreDnsLogs
 checkCoreDnsPods
-checkTraceRoute
 checkDNSResolution
+checkTraceRoute
 getTcpDump
+tearDownDebugStack
