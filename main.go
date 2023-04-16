@@ -8,6 +8,7 @@ import (
 func main() {
 
 	fmt.Println("kubectl network doctor 0.0.1")
+
 	pluginScript := "plugin/main.sh"
 
 	cmd := exec.Command(pluginScript)

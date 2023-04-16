@@ -1,9 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: traceroute-test-cm
-data:
-  custom_hosts.txt: |
-    hosts:
-      - www.google.com
-      - www.youtube.com

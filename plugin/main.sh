@@ -26,6 +26,10 @@ checkDNSResolution(){
 	cecho "BLUE" "####### Checking DNS Resolution #########"
 
 	cecho "YELLOW" "This manifests use default values in hosts.txt.You can speficy extra hosts."
+	
+	kubectl create configmap dns-func-test-cm	\
+	 	--from-file=hosts.txt
+	
 	kubectl -n ${CORE_DNS_NAMESPACE} apply -f src/dns/k8s/manifests  2>/dev/null 
 	
 	kubectl wait --for=condition=Ready pod -l app=dns-func-test --timeout=60s
@@ -40,7 +44,6 @@ checkCoreDnsLogs(){
 
 	kubectl  -n ${CORE_DNS_NAMESPACE} logs -l k8s-app=kube-dns 2>/dev/null 
 	cecho "YELLOW" "###########################"
-
 }
 
 checkCoreDnsPods(){
@@ -67,6 +70,7 @@ getTcpDump(){
 	for pod in "${CORE_DNS_PODS[@]}"
 	do
 		echo $pod
+		## add random timestamp to the nd-core-dns debug pods
 
 		kubectl -n ${CORE_DNS_NAMESPACE} debug -q -i ${pod}  \
 			 -c nd-core-dns \
@@ -79,9 +83,13 @@ getTcpDump(){
 checkTraceRoute(){
 	cecho "PURPLE" "####### TraceRoute Outputs #########"
 
+	kubectl create configmap traceroute-test-cm	\
+	 	--from-file=hosts.txt
+
 	kubectl -n ${CORE_DNS_NAMESPACE} apply -f src/traceroute/k8s/manifests  2>/dev/null
 	kubectl wait --for=condition=Ready pod -l app=traceroute-test --timeout=60s
 	kubectl logs -f -l app=traceroute-test 
+	
 	cecho "PURPLE" "###########################"
 
 }
@@ -90,6 +98,7 @@ tearDownDebugStack(){
 	
 	cecho "RED" "It is time to teardown entire stack"
 	sleep 5
+	kubectl delete cm dns-func-test-cm traceroute-test-cm
 	kubectl delete -f src/traceroute/k8s/manifests
 	kubectl delete -f src/dns/k8s/manifests
 	cecho "RED" ""###########################""
