@@ -35,31 +35,30 @@ checkDNSResolution(){
 	cecho "BLUE" "####### Checking DNS Resolution #########"
 	cecho "YELLOW" "This manifests use default values in hosts.txt.You can speficy extra hosts."
 	
-	kubectl create configmap dns-func-test-cm	\
-	 	--from-file=hosts.txt
+	kubectl create configmap dns-func-test-cm --from-file=hosts.txt -o yaml --dry-run=client |kubectl apply -n ${CORE_DNS_NAMESPACE} -f -
 	
 	kubectl -n ${CORE_DNS_NAMESPACE} apply -f ${BASE_PATH}/plugin/src/dns/k8s/manifests  2>/dev/null 
 	
-#	kubectl wait --for=condition=Ready pod -l app=dns-func-test --timeout=60s
-	sleep 60
+	kubectl wait --for=condition=Ready pod -l app=dns-func-test --timeout=60s
+
 	kubectl logs -f -l app=dns-func-test
 
 
-	cecho "BLUE" "###########################"
+	cecho "BLUE" "--------------------------"
 
 }
 
 checkCoreDnsLogs(){
-	cecho "YELLOW" "###########################"
+	cecho "YELLOW" "--------------------------"
 	cecho "YELLOW" "Gathering CoreDNS Logs......"
 
 	kubectl  -n ${CORE_DNS_NAMESPACE} logs -l k8s-app=kube-dns 2>/dev/null 
-	cecho "YELLOW" "###########################"
+	cecho "YELLOW" "--------------------------"
 }
 
 checkCoreDnsPods(){
 
-	cecho "RED" "###########################"
+	cecho "RED" "--------------------------"
 	cecho "RED" "Check coredns pod status"
 
 	kubectl -n ${CORE_DNS_NAMESPACE} get pods -l k8s-app=kube-dns \
@@ -67,7 +66,7 @@ checkCoreDnsPods(){
 
 	kubectl -n ${CORE_DNS_NAMESPACE} get deployment  |grep coredns
 
-	cecho "RED" "###########################"
+	cecho "RED" "--------------------------"
 
 }
 
@@ -87,18 +86,17 @@ getTcpDump(){
 
 		kubectl -n ${CORE_DNS_NAMESPACE} debug -q -i ${pod}  \
 			 -c nd-core-dns-${DEBUG_IDENTIFIER} \
-			--image emirozbir/tcpdumper:latest -- tcpdump -U -i eth0 -w - > "tcpdump-coredns/${pod}-dump.pcap"
+			--image emirozbir/tcpdumper:latest -- timeout 1m tcpdump -U -i eth0 #> "tcpdump-coredns/${pod}-dump.pcap"
+
 	done
-	cecho "RED" ""###########################""
+	cecho "RED" ""--------------------------""
 
 }
 
 checkTraceRoute(){
 	cecho "PURPLE" "####### TraceRoute Outputs #########"
 
-	kubectl create configmap traceroute-test-cm	\
-	 	--from-file=hosts.txt
-
+	kubectl create configmap traceroute-test-cm --from-file=hosts.txt -o yaml --dry-run=client | kubectl apply -n ${CORE_DNS_NAMESPACE} -f  -
 	kubectl -n ${CORE_DNS_NAMESPACE} apply \
 		-f ${BASE_PATH}/plugin/src/traceroute/k8s/manifests  2>/dev/null
 
@@ -107,7 +105,7 @@ checkTraceRoute(){
 
 	kubectl logs -f -l app=traceroute-test 
 	
-	cecho "PURPLE" "###########################"
+	cecho "PURPLE" "--------------------------"
 
 }
 
@@ -120,13 +118,13 @@ tearDownDebugStack(){
 	kubectl delete deployment traceroute-test-deployment
 	kubectl delete deployment dns-func-test-deployment
 	
-	cecho "RED" ""###########################""
+	cecho "RED" ""--------------------------""
 
 }
 
-checkCoreDnsLogs
-checkCoreDnsPods
-checkDNSResolution
-checkTraceRoute
+#checkCoreDnsLogs
+#checkCoreDnsPods
+#checkDNSResolution
+#checkTraceRoute
 getTcpDump
 tearDownDebugStack
