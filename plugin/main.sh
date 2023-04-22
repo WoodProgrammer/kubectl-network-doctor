@@ -82,10 +82,11 @@ getTcpDump(){
 	for pod in "${CORE_DNS_PODS[@]}"
 	do
 		echo $pod
-		## add random timestamp to the nd-core-dns debug pods
+		
+		export DEBUG_IDENTIFIER=$(openssl rand -hex 4)
 
 		kubectl -n ${CORE_DNS_NAMESPACE} debug -q -i ${pod}  \
-			 -c nd-core-dns \
+			 -c nd-core-dns-${DEBUG_IDENTIFIER} \
 			--image emirozbir/tcpdumper:latest -- tcpdump -U -i eth0 -w - > "tcpdump-coredns/${pod}-dump.pcap"
 	done
 	cecho "RED" ""###########################""
