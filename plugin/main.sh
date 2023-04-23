@@ -1,7 +1,7 @@
 #!/bin/bash
 
-[[ -n $DEBUG ]] && set -x
-set -eou pipefail
+#[[ -n $DEBUG ]] && set -x
+#set -eou pipefail
 
 export CORE_DNS_NAMESPACE="${1:-kube-system}"
 export BASE_PATH=$(pwd)
@@ -69,25 +69,40 @@ checkCoreDnsPods(){
 	cecho "RED" "--------------------------"
 
 }
+callDebugTcpDump(){
+	export pod=$1
+	export DEBUG_IDENTIFIER=$(openssl rand -hex 4)
+
+	if [ -z $pod ];
+	then
+		cecho "RED" "ERROR please identify name of coredns pods"
+	else
+		echo "nd-core-dns-${DEBUG_IDENTIFIER}"
+		kubectl -n kube-system debug -q -i ${pod}  \
+			-c nd-core-dns-${DEBUG_IDENTIFIER} \
+			--image emirozbir/tcpdumper:latest -- /bin/sh -c "timeout 60 tcpdump -U -i eth0 -w -"
+		
+		kubectl logs -f -n kube-system ${pod} -c nd-core-dns-${DEBUG_IDENTIFIER} > tcpdump-coredns/${pod}.pcap
+	fi
+}
+
+	
+	
 
 getTcpDump(){
 	cecho "RED" "####### Gathering TCPDump from CoreDNS #########"
 
-	CORE_DNS_PODS=$(kubectl -n ${CORE_DNS_NAMESPACE} get po  -l k8s-app=kube-dns  --no-headers -o custom-columns=":metadata.name" )
-
+	CORE_DNS_PODS=($(kubectl -n ${CORE_DNS_NAMESPACE} get po  -l k8s-app=kube-dns  --no-headers -o custom-columns=":metadata.name" ))
 	mkdir -p tcpdump-coredns
 	cecho "RED" "$CORE_DNS_PODS" 
 
 	for pod in "${CORE_DNS_PODS[@]}"
 	do
 		echo $pod
-		
-		export DEBUG_IDENTIFIER=$(openssl rand -hex 4)
-
-		kubectl -n ${CORE_DNS_NAMESPACE} debug -q -i ${pod}  \
-			 -c nd-core-dns-${DEBUG_IDENTIFIER} \
-			--image emirozbir/tcpdumper:latest -- timeout 1m tcpdump -U -i eth0 #> "tcpdump-coredns/${pod}-dump.pcap"
-
+	
+		callDebugTcpDump $pod
+		#		kubectl -n kube-system debug -i coredns-64897985d-kdnz6 -c hede-timeout-${DEBUG_IDENTIFIER} --image emirozbir/tcpdumper:latest -- tcpdump -U -i eth0 -w -
+		echo "Result is $?"
 	done
 	cecho "RED" ""--------------------------""
 
@@ -127,4 +142,4 @@ tearDownDebugStack(){
 #checkDNSResolution
 #checkTraceRoute
 getTcpDump
-tearDownDebugStack
+#tearDownDebugStack
