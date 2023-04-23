@@ -56,18 +56,22 @@ func main() {
 This script basically creates number of pods \n
 and run some queries please check WoodProgrammer/kubectl-network-doctor`)
 
-	pluginScript := "plugin/main.sh"
+	pluginScript := "/bin/bash plugin/main.sh"
 	checkHostsFile()
 
 	cmd := exec.Command(pluginScript)
-	stdout, err := cmd.StdoutPipe()
+	err := cmd.Run()
+	if err != nil {
+		log.Fatalf("cmd.Run() failed with %s\n", err)
+	}
+	/*stdout, err := cmd.StdoutPipe()
 	cmd.Stderr = cmd.Stdout
 
 	if err != nil {
 		fmt.Println(err.Error())
 	}
 
-	if err = cmd.Start(); err != nil {
+	if err = cmd.Run(); err != nil {
 		fmt.Println(err.Error())
 
 	}
@@ -79,5 +83,5 @@ and run some queries please check WoodProgrammer/kubectl-network-doctor`)
 		if err != nil {
 			break
 		}
-	}
+	}*/
 }
