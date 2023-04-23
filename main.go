@@ -60,11 +60,7 @@ and run some queries please check WoodProgrammer/kubectl-network-doctor`)
 	checkHostsFile()
 
 	cmd := exec.Command(pluginScript)
-	err := cmd.Run()
-	if err != nil {
-		log.Fatalf("cmd.Run() failed with %s\n", err)
-	}
-	/*stdout, err := cmd.StdoutPipe()
+	stdout, err := cmd.StdoutPipe()
 	cmd.Stderr = cmd.Stdout
 
 	if err != nil {
@@ -83,5 +79,5 @@ and run some queries please check WoodProgrammer/kubectl-network-doctor`)
 		if err != nil {
 			break
 		}
-	}*/
+	}
 }
