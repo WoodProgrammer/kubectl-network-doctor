@@ -1,16 +1,11 @@
 #!/bin/bash
-
+export BASE_PATH=$(pwd)
 [[ -n $DEBUG ]] && set -x
 
 set -eou pipefail
 set -o nounset
 
 IFS=$'\n\t'
-
-export CORE_DNS_NAMESPACE="${1:-kube-system}"
-export TCP_DUMP_TIMEOUT="${2:-10}"
-
-export BASE_PATH=$(pwd)
 
 trap ctrl_c INT
 
@@ -32,14 +27,24 @@ cecho(){
     printf "${!1}${2} ${NC}\n"
 }
 
-cecho "BLUE" "KUBECTL Network Docker Version number::0.0.1"
+cecho "BLUE" "KUBECTL Network Doctor Version number::0.0.1"
 
 
 cat << "EOF"
- ,_,
-(O,O)
-(   )
--"-"--------------
+        .----. 
+       ===(_)==   Kubectl Network Doctor 0.0.1
+      // 6  6 \\  /
+      (    7   )
+       \ '--' /
+        \_ ._/
+       __)  (__
+    /"`/`\`V/`\`\
+   /   \  `Y _/_ \
+  / [DR]\_ |/ / /\
+  |     ( \/ / / /
+   \  \  \      /
+    \  `-/`  _.`
+     `=._`=./
 EOF
 
 cecho "RED" "This script basically creates number of pods \n and run some queries please check WoodProgrammer/kubectl-network-doctor"
@@ -96,17 +101,24 @@ callDebugTcpDump(){
 	else
 		cecho "RED" "WARNING:: Gathering TCPDump of the pod :: ${pod}"
 
-		kubectl -n kube-system debug -q -i ${pod} --image nicolaka/netshoot \
-			-- timeout ${TCP_DUMP_TIMEOUT} tcpdump -i eth0 -w - > tcpdump-coredns/${pod}.pcap
+
+		if [ "${TCP_DUMP_MODE}" = "stream" ];
+		then
+			cecho "GREEN" "WARNING:: To continue the stream analyse you can can close Wireshark"
+
+			kubectl -n kube-system debug -q -i ${pod} --image nicolaka/netshoot \
+				-- timeout ${TCP_DUMP_TIMEOUT} tcpdump -i eth0 -w - | wireshark -k -i -
+		else
+			kubectl -n kube-system debug -q -i ${pod} --image nicolaka/netshoot \
+				-- timeout ${TCP_DUMP_TIMEOUT} tcpdump -i eth0 -w - > tcpdump-coredns/${pod}.pcap
+		fi
 
 		if [ -s "tcpdump-coredns/${pod}.pcap" ];
 		then
-			cecho "RED" "ERROR:: Tcpdump file is empty"
-		else
 			cecho "BLUE" "INFO:: Tcpdump file has already written properly"
+		else
+			cecho "RED" "ERROR:: Tcpdump file is empty"
 		fi
-
-		cecho "BLUE" "TCPDUMP Completed and written to the file tcpdump-coredns/${pod}.pcap"
 	fi
 }	
 
@@ -158,9 +170,20 @@ tearDownDebugStack(){
 
 }
 
-#checkCoreDnsLogs
-#checkCoreDnsPods
-#checkDNSResolution
-#checkTraceRoute
-getTcpDump
-#tearDownDebugStack
+
+main(){
+
+  export CORE_DNS_NAMESPACE="${1:-kube-system}"
+  export TCP_DUMP_TIMEOUT="${2:-10}"
+  export TCP_DUMP_MODE="${3:-wireshark}"
+
+  checkCoreDnsLogs
+  checkCoreDnsPods
+  checkDNSResolution
+  checkTraceRoute
+  getTcpDump
+  tearDownDebugStack
+
+}
+
+main
