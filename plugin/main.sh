@@ -1,9 +1,15 @@
 #!/bin/bash
 
-#[[ -n $DEBUG ]] && set -x
-#set -eou pipefail
+[[ -n $DEBUG ]] && set -x
+
+set -eou pipefail
+set -o nounset
+
+IFS=$'\n\t'
 
 export CORE_DNS_NAMESPACE="${1:-kube-system}"
+export TCP_DUMP_TIMEOUT="${2:-10}"
+
 export BASE_PATH=$(pwd)
 
 trap ctrl_c INT
@@ -26,9 +32,20 @@ cecho(){
     printf "${!1}${2} ${NC}\n"
 }
 
+cecho "BLUE" "KUBECTL Network Docker Version number::0.0.1"
 
-cecho "RED" "Kubectl Network Doctor 0.0.1 is a triage plugin that we are using to get system dump of the essential network components"
-cecho "RED" "This is demo version"
+
+cat << "EOF"
+ ,_,
+(O,O)
+(   )
+-"-"--------------
+EOF
+
+cecho "RED" "This script basically creates number of pods \n and run some queries please check WoodProgrammer/kubectl-network-doctor"
+
+cecho "BLUE" "Kubectl Network Doctor 0.0.1 is a triage plugin that we are using to get system dump of the essential network components"
+cecho "YELLOW" "This is demo version"
 sleep 4
 
 checkDNSResolution(){
@@ -69,25 +86,29 @@ checkCoreDnsPods(){
 	cecho "RED" "--------------------------"
 
 }
+
 callDebugTcpDump(){
 	export pod=$1
-	export DEBUG_IDENTIFIER=$(openssl rand -hex 4)
 
 	if [ -z $pod ];
 	then
 		cecho "RED" "ERROR please identify name of coredns pods"
 	else
-		echo "nd-core-dns-${DEBUG_IDENTIFIER}"
-		kubectl -n kube-system debug -q -i ${pod}  \
-			-c nd-core-dns-${DEBUG_IDENTIFIER} \
-			--image emirozbir/tcpdumper:latest -- /bin/sh -c "timeout 60 tcpdump -U -i eth0 -w -"
-		
-		kubectl logs -f -n kube-system ${pod} -c nd-core-dns-${DEBUG_IDENTIFIER} > tcpdump-coredns/${pod}.pcap
-	fi
-}
+		cecho "RED" "WARNING:: Gathering TCPDump of the pod :: ${pod}"
 
-	
-	
+		kubectl -n kube-system debug -q -i ${pod} --image nicolaka/netshoot \
+			-- timeout ${TCP_DUMP_TIMEOUT} tcpdump -i eth0 -w - > tcpdump-coredns/${pod}.pcap
+
+		if [ -s "tcpdump-coredns/${pod}.pcap" ];
+		then
+			cecho "RED" "ERROR:: Tcpdump file is empty"
+		else
+			cecho "BLUE" "INFO:: Tcpdump file has already written properly"
+		fi
+
+		cecho "BLUE" "TCPDUMP Completed and written to the file tcpdump-coredns/${pod}.pcap"
+	fi
+}	
 
 getTcpDump(){
 	cecho "RED" "####### Gathering TCPDump from CoreDNS #########"
@@ -101,7 +122,7 @@ getTcpDump(){
 		echo $pod
 	
 		callDebugTcpDump $pod
-		#		kubectl -n kube-system debug -i coredns-64897985d-kdnz6 -c hede-timeout-${DEBUG_IDENTIFIER} --image emirozbir/tcpdumper:latest -- tcpdump -U -i eth0 -w -
+
 		echo "Result is $?"
 	done
 	cecho "RED" ""--------------------------""
