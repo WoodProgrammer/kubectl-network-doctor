@@ -61,8 +61,8 @@ checkDNSResolution(){
 	
 	kubectl -n ${CORE_DNS_NAMESPACE} apply -f ${BASE_PATH}/plugin/src/dns/k8s/manifests  2>/dev/null 
 	
-	kubectl wait --for=condition=Ready pod -l app=dns-func-test --timeout=60s
-
+	#kubectl wait --for=condition=Ready pod -l app=dns-func-test --timeout=60s easy way :=) 
+	sleep 90
 	kubectl logs -f -l app=dns-func-test
 
 
@@ -148,9 +148,10 @@ checkTraceRoute(){
 	kubectl -n ${CORE_DNS_NAMESPACE} apply \
 		-f ${BASE_PATH}/plugin/src/traceroute/k8s/manifests  2>/dev/null
 
-	kubectl wait --for=condition=Ready pod \
-		-l app=traceroute-test --timeout=60s
-
+	#kubectl wait --for=condition=Ready pod \
+	#	-l app=traceroute-test --timeout=60s
+	sleep 90
+	
 	kubectl logs -f -l app=traceroute-test 
 	
 	cecho "PURPLE" "--------------------------"
@@ -170,6 +171,20 @@ tearDownDebugStack(){
 
 }
 
+createHostFile(){
+	FILE_STAT=$(file -s hosts.txt)
+	if [ -e hosts.txt ];
+	then
+		cecho "BLUE" "Hosts file exists"
+	else
+		cecho "BLUE" "Creating hosts file "
+cat > hosts.txt <<EOF
+www.youtube.com
+www.google.com
+google.com
+EOF
+	fi
+}
 
 main(){
 
@@ -177,12 +192,13 @@ main(){
   export TCP_DUMP_TIMEOUT="${2:-10}"
   export TCP_DUMP_MODE="${3:-wireshark}"
 
-  checkCoreDnsLogs
-  checkCoreDnsPods
+  createHostFile
+  #checkCoreDnsLogs
+  #checkCoreDnsPods
   checkDNSResolution
   checkTraceRoute
-  getTcpDump
-  tearDownDebugStack
+  #getTcpDump
+  #tearDownDebugStack
 
 }
 
