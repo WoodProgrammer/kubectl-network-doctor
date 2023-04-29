@@ -102,7 +102,7 @@ callDebugTcpDump(){
 		cecho "RED" "WARNING:: Gathering TCPDump of the pod :: ${pod}"
 
 
-		if [ "${TCP_DUMP_MODE}" = "stream" ];
+		if [ "${TCP_DUMP_MODE}" = "wireshark" ];
 		then
 			cecho "GREEN" "WARNING:: To continue the stream analyse you can can close Wireshark"
 
@@ -151,7 +151,7 @@ checkTraceRoute(){
 	#kubectl wait --for=condition=Ready pod \
 	#	-l app=traceroute-test --timeout=60s
 	sleep 90
-	
+
 	kubectl logs -f -l app=traceroute-test 
 	
 	cecho "PURPLE" "--------------------------"
@@ -192,13 +192,17 @@ main(){
   export TCP_DUMP_TIMEOUT="${2:-10}"
   export TCP_DUMP_MODE="${3:-wireshark}"
 
+  cecho "RED" "CoreDNS namespace:: ${CORE_DNS_NAMESPACE}"
+  cecho "RED" "TcpDump Timeout is:: ${TCP_DUMP_TIMEOUT}"
+  cecho "RED" "TcpDump Mode:: ${TCP_DUMP_MODE}"
+
   createHostFile
-  #checkCoreDnsLogs
-  #checkCoreDnsPods
+  checkCoreDnsLogs
+  checkCoreDnsPods
   checkDNSResolution
   checkTraceRoute
-  #getTcpDump
-  #tearDownDebugStack
+  getTcpDump
+  tearDownDebugStack
 
 }
 
