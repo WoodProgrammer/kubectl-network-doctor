@@ -58,13 +58,40 @@ checkDNSResolution(){
 	cecho "YELLOW" "This manifests use default values in hosts.txt.You can speficy extra hosts."
 	
 	kubectl create configmap dns-func-test-cm --from-file=hosts.txt -o yaml --dry-run=client |kubectl apply -n ${CORE_DNS_NAMESPACE} -f -
-	
-	kubectl -n ${CORE_DNS_NAMESPACE} apply -f ${BASE_PATH}/plugin/src/dns/k8s/manifests  2>/dev/null 
-	
-	#kubectl wait --for=condition=Ready pod -l app=dns-func-test --timeout=60s easy way :=) 
-	sleep 90
-	kubectl logs -f -l app=dns-func-test
 
+kubectl apply -n ${CORE_DNS_NAMESPACE}  -f - <<EOF
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dns-func-test-deployment
+  labels:
+    app: dns-func-test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dns-func-test
+  template:
+    metadata:
+      labels:
+        app: dns-func-test
+    spec:
+      containers:
+      - name: dns-func-test
+        image: emirozbir/dns-func-test:0.0.1
+        imagePullPolicy: Always
+        volumeMounts:
+          - name: mnt
+            mountPath: /app/hosts.txt
+            subPath: hosts.txt
+      volumes:
+      - name: mnt
+        configMap:
+          name: dns-func-test-cm
+EOF
+	sleep 40
+	#kubectl wait --for=condition=Ready pod -l app=dns-func-test --timeout=60s
+	kubectl logs -f -l app=dns-func-test
 
 	cecho "BLUE" "--------------------------"
 
@@ -145,12 +172,45 @@ checkTraceRoute(){
 	cecho "PURPLE" "####### TraceRoute Outputs #########"
 
 	kubectl create configmap traceroute-test-cm --from-file=hosts.txt -o yaml --dry-run=client | kubectl apply -n ${CORE_DNS_NAMESPACE} -f  -
-	kubectl -n ${CORE_DNS_NAMESPACE} apply \
-		-f ${BASE_PATH}/plugin/src/traceroute/k8s/manifests  2>/dev/null
+	
+	
 
+kubectl apply -n ${CORE_DNS_NAMESPACE}  -f - <<EOF
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: traceroute-test-deployment
+  labels:
+    app: traceroute-test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: traceroute-test
+  template:
+    metadata:
+      labels:
+        app: traceroute-test
+    spec:
+      containers:
+      - name: traceroute-test
+        image: emirozbir/traceroute-test:0.0.1
+        imagePullPolicy: Always
+        volumeMounts:
+          - name: mnt
+            mountPath: /opt/traceroute/hosts.txt
+            subPath: hosts.txt
+      volumes:
+      - name: mnt
+        configMap:
+          name: traceroute-test-cm
+          items:
+          - key: hosts.txt
+            path: hosts.txt
+EOF
+	sleep 40
 	#kubectl wait --for=condition=Ready pod \
 	#	-l app=traceroute-test --timeout=60s
-	sleep 90
 
 	kubectl logs -f -l app=traceroute-test 
 	
@@ -185,6 +245,7 @@ google.com
 EOF
 	fi
 }
+
 
 main(){
 
