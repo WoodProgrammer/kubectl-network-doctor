@@ -37,6 +37,15 @@ This plugin basically gather three argument, one of is name of the  `namespace`,
 
 Also with this plugin you can test the results of the dns time and traceroute outputs for the specific hosts with the `hosts.txt` file like this;
 
+This tool setup two deployment on your cluster shown at below;
+* traceroute-test
+* dns-test
+
+These deployments basically mount the hosts txt file as a configmap and runs some scripts on it you can check these scripts under these directories;
+
+<b>Dns Test deployment details ; <a href="plugin/src/dns/"> </b>
+<b>TraceRoute Test deployment details ; <a href="plugin/src/traceroute/"> </b>
+
 ## Dns and TraceRoute Resolution file
 
 ```txt
