@@ -80,6 +80,7 @@ spec:
       - name: dns-func-test
         image: emirozbir/dns-func-test:0.0.1
         imagePullPolicy: Always
+        command: ["./main"]
         volumeMounts:
           - name: mnt
             mountPath: /app/hosts.txt
@@ -196,6 +197,7 @@ spec:
       - name: traceroute-test
         image: emirozbir/traceroute-test:0.0.1
         imagePullPolicy: Always
+        command: ["./main.sh"]
         volumeMounts:
           - name: mnt
             mountPath: /opt/traceroute/hosts.txt
