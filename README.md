@@ -55,3 +55,12 @@ The problems that covered by this plugin;
     * pod-to-pod communication (based on topology keys or labels)
     * node-to-node communication
     * node network configuration
+
+
+# RoadMap
+
+We will provide command line flags and other user friendly options to this plugin.
+
+# Related Links;
+
+<a href="https://www.wireshark.org/">WireShark Installation </a>
