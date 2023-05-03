@@ -91,7 +91,7 @@ spec:
 EOF
 	sleep 40
 	#kubectl wait --for=condition=Ready pod -l app=dns-func-test --timeout=60s
-	kubectl logs -f -l app=dns-func-test
+	kubectl logs -f -l app=dns-func-test -n ${CORE_DNS_NAMESPACE}
 
 	cecho "BLUE" "--------------------------"
 
@@ -212,7 +212,7 @@ EOF
 	#kubectl wait --for=condition=Ready pod \
 	#	-l app=traceroute-test --timeout=60s
 
-	kubectl logs -f -l app=traceroute-test 
+	kubectl logs -f -l app=traceroute-test  -n ${CORE_DNS_NAMESPACE}
 	
 	cecho "PURPLE" "--------------------------"
 
