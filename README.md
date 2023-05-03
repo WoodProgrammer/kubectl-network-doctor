@@ -43,8 +43,9 @@ This tool setup two deployment on your cluster shown at below;
 
 These deployments basically mount the hosts txt file as a configmap and runs some scripts on it you can check these scripts under these directories;
 
-<b>Dns Test deployment details ; <a href="plugin/src/dns/"> </b>
-<b>TraceRoute Test deployment details ; <a href="plugin/src/traceroute/"> </b>
+<a href="plugin/src/dns/">Dns Tester</a>
+<br>
+<a href="plugin/src/traceroute/">TraceRoute Tester</a>
 
 ## Dns and TraceRoute Resolution file
 
