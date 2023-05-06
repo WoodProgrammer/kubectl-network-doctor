@@ -1,45 +1,56 @@
 package main
 
 import (
+	"bytes"
 	"context"
-	"flag"
 	"fmt"
-	"path/filepath"
+	"io"
+	"log"
 
 	appsv1 "k8s.io/api/apps/v1"
 	apiv1 "k8s.io/api/core/v1"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/tools/clientcmd"
-	"k8s.io/client-go/util/homedir"
 )
 
 // emirozbir/traceroute-test:0.0.1
 // []string{"./main.sh"}
 
-func createDeployment(deploymentName string, imageName string, command string, namespaceName string) {
+func gatherLogs(deploymentLabel string, namespaceName string, clientset *kubernetes.Clientset) {
 
-	var kubeconfig *string
+	podLogOpts := corev1.PodLogOptions{}
 
-	if namespaceName == "" {
-		namespaceName = "kube-system"
-	}
-	if home := homedir.HomeDir(); home != "" {
-		kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
-	} else {
-		kubeconfig = flag.String("kubeconfig", "", "absolute path to the kubeconfig file")
+	labelSelector := metav1.LabelSelector{MatchLabels: map[string]string{"app": deploymentLabel}}
+	listOptions := metav1.ListOptions{
+		LabelSelector: labels.Set(labelSelector.MatchLabels).String(),
 	}
 
-	flag.Parse()
+	pods, _ := clientset.CoreV1().Pods(namespaceName).List(context.TODO(), listOptions)
 
-	config, err := clientcmd.BuildConfigFromFlags("", *kubeconfig)
-	if err != nil {
-		panic(err)
+	for _, pod := range pods.Items {
+
+		req := clientset.CoreV1().Pods(namespaceName).GetLogs(pod.Name, &podLogOpts)
+		podLogs, err := req.Stream(context.TODO())
+		if err != nil {
+			fmt.Println(err)
+			log.Fatal("error in opening stream")
+		}
+
+		defer podLogs.Close()
+
+		buf := new(bytes.Buffer)
+		_, err = io.Copy(buf, podLogs)
+		if err != nil {
+			log.Fatal("")
+		}
+		str := buf.String()
+		fmt.Println(str)
 	}
-	clientset, err := kubernetes.NewForConfig(config)
-	if err != nil {
-		panic(err)
-	}
+}
+
+func createDeployment(deploymentName string, imageName string, command []string, namespaceName string, clientset *kubernetes.Clientset) {
 
 	deploymentsClient := clientset.AppsV1().Deployments("kube-system")
 
