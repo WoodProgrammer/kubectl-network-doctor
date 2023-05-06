@@ -43,7 +43,7 @@ func generateHostsFile(fileName string) map[string]string {
 
 }
 
-func createConfigMap(data map[string]string, clientset *kubernetes.Clientset) {
+func createConfigMap(configMapName string, namespaceName string, data map[string]string, clientset *kubernetes.Clientset) {
 
 	cm := corev1.ConfigMap{
 		TypeMeta: metav1.TypeMeta{
@@ -51,8 +51,8 @@ func createConfigMap(data map[string]string, clientset *kubernetes.Clientset) {
 			APIVersion: "v1",
 		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "my-config-map",
-			Namespace: "kube-system",
+			Name:      configMapName,
+			Namespace: namespaceName,
 		},
 		Data: data,
 	}

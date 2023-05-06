@@ -25,6 +25,11 @@ var mode = &cobra.Command{
 		command := []string{"./main"}
 		clientset := configHandler()
 		if args[0] == "dns" {
+
+			data := generateHostsFile("hosts.txt")
+
+			createConfigMap("dns-test-configmap", "kube-system", data, clientset)
+
 			createDeployment("dns", "emirozbir/dns-func-test:0.0.1", command, "kube-system", clientset)
 			gatherLogs("dns-test", "kube-system", clientset)
 		}
