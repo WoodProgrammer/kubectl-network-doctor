@@ -28,7 +28,6 @@ func gatherLogs(deploymentLabel string, namespaceName string, clientset *kuberne
 	}
 
 	pods, _ := clientset.CoreV1().Pods(namespaceName).List(context.TODO(), listOptions)
-
 	for _, pod := range pods.Items {
 
 		req := clientset.CoreV1().Pods(namespaceName).GetLogs(pod.Name, &podLogOpts)

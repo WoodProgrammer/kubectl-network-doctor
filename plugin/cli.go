@@ -26,7 +26,7 @@ var mode = &cobra.Command{
 		clientset := configHandler()
 		if args[0] == "dns" {
 			//createDeployment("dns", "emirozbir/dns-func-test:0.0.1", command, "kube-system")
-			gatherLogs("dns", "kube-system", clientset)
+			gatherLogs("dns-test", "kube-system", clientset)
 		}
 	},
 }
