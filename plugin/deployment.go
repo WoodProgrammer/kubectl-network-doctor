@@ -78,6 +78,18 @@ func createDeployment(deploymentName string, imageName string, command []string,
 							Command: command,
 						},
 					},
+					Volumes: []corev1.Volume{
+						{
+							Name: "redis-config",
+							VolumeSource: corev1.VolumeSource{
+								ConfigMap: &corev1.ConfigMapVolumeSource{
+									LocalObjectReference: corev1.LocalObjectReference{
+										Name: configMapName,
+									},
+								},
+							},
+						},
+					},
 				},
 			},
 		},
