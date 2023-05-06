@@ -22,10 +22,10 @@ var mode = &cobra.Command{
 	Aliases: []string{"mode"},
 	Args:    cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		//command := []string{"./main"}
+		command := []string{"./main"}
 		clientset := configHandler()
 		if args[0] == "dns" {
-			//createDeployment("dns", "emirozbir/dns-func-test:0.0.1", command, "kube-system")
+			createDeployment("dns", "emirozbir/dns-func-test:0.0.1", command, "kube-system", clientset)
 			gatherLogs("dns-test", "kube-system", clientset)
 		}
 	},
