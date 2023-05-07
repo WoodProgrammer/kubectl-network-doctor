@@ -5,6 +5,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/schollz/progressbar/v3"
 	"github.com/spf13/cobra"
 )
 
@@ -31,8 +32,12 @@ var mode = &cobra.Command{
 
 			createConfigMap("dns-test-configmap", "kube-system", data, clientset)
 			createDeployment("dns", "emirozbir/dns-func-test:0.0.1", command, "kube-system", clientset)
-			time.Sleep(50 * time.Second)
-			fmt.Println("Sleeping ... g")
+			fmt.Println("INFO:::Waiting for the results of the logs until the deployment get ready approx:: 50 sec")
+			bar := progressbar.Default(50)
+			for i := 0; i < 50; i++ {
+				bar.Add(1)
+				time.Sleep(1 * time.Second)
+			}
 			gatherLogs("dns-test", "kube-system", clientset)
 			deleteDeployment("dns-deployment", "kube-system", clientset)
 			deleteConfigMap("dns-test-configmap", "kube-system", clientset)
