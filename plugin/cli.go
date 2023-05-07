@@ -30,16 +30,23 @@ var mode = &cobra.Command{
 		data := generateHostsFile("hosts.txt")
 
 		if args[0] == "dns" {
+			getDeployment("coredns", "kube-system", clientset)
 
 			createConfigMap("dns-test-configmap", "kube-system", data, clientset)
 			createDeployment("dns", "emirozbir/dns-func-test:0.0.1", command, "kube-system", "/app", clientset)
+
+			fmt.Println("INFO:: Gathering DNS TesterResults")
+			gatherLogs("coredns", "kube-system", clientset) //coredns Logs
+
 			fmt.Println("INFO:::Waiting for the results of the logs until the DnsTester deployment get ready approx:: 50 sec")
 			bar := progressbar.Default(50)
 			for i := 0; i < 50; i++ {
 				bar.Add(1)
 				time.Sleep(1 * time.Second)
 			}
-			gatherLogs("dns-test", "kube-system", clientset)
+
+			gatherLogs("dns-test", "kube-system", clientset) // dns-test-logs
+
 			deleteDeployment("dns-deployment", "kube-system", "dns-stack", clientset)
 			deleteConfigMap("dns-test-configmap", "kube-system", clientset)
 		} else if args[0] == "traceroute" {

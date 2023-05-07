@@ -61,6 +61,21 @@ func deleteDeployment(deploymentName string, namespaceName string, stackName str
 	fmt.Println("Tearing down %s stack - deployment deleted", stackName)
 }
 
+func getDeployment(deploymentName string, namespaceName string, clientset *kubernetes.Clientset) {
+
+	fmt.Println("The Replica status of core-dns pods under kube-system")
+	deploymentsClient := clientset.AppsV1().Deployments(namespaceName)
+
+	result, err := deploymentsClient.Get(context.TODO(), deploymentName, metav1.GetOptions{})
+
+	if err != nil {
+		fmt.Printf("ERROR:: Gathering %s deployment status \n", err)
+	} else {
+		fmt.Println("INFO:: Desired Replicas of ::", deploymentName, *result.Spec.Replicas)
+		fmt.Println("INFO:: Available Replicas of ::", deploymentName, result.Status.AvailableReplicas)
+	}
+}
+
 func createDeployment(deploymentName string, imageName string, command []string, namespaceName string, mountPath string, clientset *kubernetes.Clientset) {
 
 	deploymentsClient := clientset.AppsV1().Deployments("kube-system")
