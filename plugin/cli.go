@@ -24,6 +24,7 @@ var mode = &cobra.Command{
 	Aliases: []string{"mode"},
 	Args:    cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
+
 		command := []string{"./main"}
 		trCommand := []string{"./main.sh"}
 		clientset := configHandler()
