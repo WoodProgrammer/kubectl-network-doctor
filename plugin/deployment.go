@@ -76,15 +76,22 @@ func createDeployment(deploymentName string, imageName string, command []string,
 							Name:    deploymentName + "-test",
 							Image:   imageName,
 							Command: command,
+							VolumeMounts: []corev1.VolumeMount{
+								{
+									Name:      "mnt",
+									MountPath: "/app/hosts.txt",
+									SubPath:   "hosts.txt",
+								},
+							},
 						},
 					},
 					Volumes: []corev1.Volume{
 						{
-							Name: "redis-config",
+							Name: "mnt",
 							VolumeSource: corev1.VolumeSource{
 								ConfigMap: &corev1.ConfigMapVolumeSource{
 									LocalObjectReference: corev1.LocalObjectReference{
-										Name: configMapName,
+										Name: deploymentName + "-test-configmap",
 									},
 								},
 							},

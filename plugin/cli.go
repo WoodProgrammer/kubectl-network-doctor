@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/spf13/cobra"
 )
@@ -29,8 +30,9 @@ var mode = &cobra.Command{
 			data := generateHostsFile("hosts.txt")
 
 			createConfigMap("dns-test-configmap", "kube-system", data, clientset)
-
 			createDeployment("dns", "emirozbir/dns-func-test:0.0.1", command, "kube-system", clientset)
+			time.Sleep(50 * time.Second)
+			fmt.Println("Sleeping ... g")
 			gatherLogs("dns-test", "kube-system", clientset)
 		}
 	},

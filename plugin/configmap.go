@@ -31,11 +31,11 @@ func generateHostsFile(fileName string) map[string]string {
 
 	if _, err := os.Stat(fileName); err == nil {
 		fmt.Println("The file is exist:: %s", fileName)
-		configMap["data"] = readHostList(fileName)
+		configMap["hosts.txt"] = readHostList(fileName)
 
 	} else {
 		fmt.Println("The file %s is not exist in generating with default addresses", fileName)
-		configMap["data"] = "www.youtube.com\nwww.google.com\nifconfig.co"
+		configMap["hosts.txt"] = "www.youtube.com\nwww.google.com\nifconfig.co"
 
 	}
 
