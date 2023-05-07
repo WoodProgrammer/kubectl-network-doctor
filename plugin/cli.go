@@ -32,11 +32,11 @@ var mode = &cobra.Command{
 		if args[0] == "dns" {
 			getDeployment("coredns", "kube-system", clientset)
 
+			fmt.Println("INFO:: Gathering CoreDNS Logs")
+			gatherLogs("k8s-app", "kube-dns", "kube-system", clientset) //coredns Logs
+
 			createConfigMap("dns-test-configmap", "kube-system", data, clientset)
 			createDeployment("dns", "emirozbir/dns-func-test:0.0.1", command, "kube-system", "/app", clientset)
-
-			fmt.Println("INFO:: Gathering DNS TesterResults")
-			gatherLogs("coredns", "kube-system", clientset) //coredns Logs
 
 			fmt.Println("INFO:::Waiting for the results of the logs until the DnsTester deployment get ready approx:: 50 sec")
 			bar := progressbar.Default(50)
@@ -45,7 +45,7 @@ var mode = &cobra.Command{
 				time.Sleep(1 * time.Second)
 			}
 
-			gatherLogs("dns-test", "kube-system", clientset) // dns-test-logs
+			gatherLogs("app", "dns-test", "kube-system", clientset) // dns-test-logs
 
 			deleteDeployment("dns-deployment", "kube-system", "dns-stack", clientset)
 			deleteConfigMap("dns-test-configmap", "kube-system", clientset)
@@ -59,7 +59,7 @@ var mode = &cobra.Command{
 				bar.Add(1)
 				time.Sleep(1 * time.Second)
 			}
-			gatherLogs("traceroute-test", "kube-system", clientset)
+			gatherLogs("app", "traceroute-test", "kube-system", clientset)
 			deleteDeployment("traceroute-deployment", "kube-system", "traceroute-stack", clientset)
 			deleteConfigMap("traceroute-test-configmap", "kube-system", clientset)
 

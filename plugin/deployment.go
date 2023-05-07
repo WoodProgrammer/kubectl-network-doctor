@@ -18,11 +18,11 @@ import (
 // emirozbir/traceroute-test:0.0.1
 // []string{"./main.sh"}
 
-func gatherLogs(deploymentLabel string, namespaceName string, clientset *kubernetes.Clientset) {
+func gatherLogs(deploymentKey string, deploymentValue string, namespaceName string, clientset *kubernetes.Clientset) {
 
 	podLogOpts := corev1.PodLogOptions{}
 
-	labelSelector := metav1.LabelSelector{MatchLabels: map[string]string{"app": deploymentLabel}}
+	labelSelector := metav1.LabelSelector{MatchLabels: map[string]string{deploymentKey: deploymentValue}}
 	listOptions := metav1.ListOptions{
 		LabelSelector: labels.Set(labelSelector.MatchLabels).String(),
 	}
