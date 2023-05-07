@@ -49,6 +49,18 @@ func gatherLogs(deploymentLabel string, namespaceName string, clientset *kuberne
 	}
 }
 
+func deleteDeployment(deploymentName string, namespaceName string, clientset *kubernetes.Clientset) {
+	deploymentsClient := clientset.AppsV1().Deployments(namespaceName)
+
+	deletePolicy := metav1.DeletePropagationForeground
+	if err := deploymentsClient.Delete(context.TODO(), deploymentName, metav1.DeleteOptions{
+		PropagationPolicy: &deletePolicy,
+	}); err != nil {
+		panic(err)
+	}
+	fmt.Println("Tearing down dns stack - deployment deleted")
+}
+
 func createDeployment(deploymentName string, imageName string, command []string, namespaceName string, clientset *kubernetes.Clientset) {
 
 	deploymentsClient := clientset.AppsV1().Deployments("kube-system")

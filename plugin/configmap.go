@@ -43,6 +43,14 @@ func generateHostsFile(fileName string) map[string]string {
 
 }
 
+func deleteConfigMap(configMapName string, namespaceName string, clientset *kubernetes.Clientset) {
+
+	result := clientset.CoreV1().ConfigMaps("kube-system").Delete(context.TODO(), configMapName, metav1.DeleteOptions{})
+
+	fmt.Println("Tearing down dns stack - deployment deleted %s", result)
+
+}
+
 func createConfigMap(configMapName string, namespaceName string, data map[string]string, clientset *kubernetes.Clientset) {
 
 	cm := corev1.ConfigMap{
@@ -57,11 +65,9 @@ func createConfigMap(configMapName string, namespaceName string, data map[string
 		Data: data,
 	}
 
-	err, result := clientset.CoreV1().ConfigMaps("kube-system").Create(context.TODO(), &cm, metav1.CreateOptions{})
+	err, _ := clientset.CoreV1().ConfigMaps("kube-system").Create(context.TODO(), &cm, metav1.CreateOptions{})
 
 	if err != nil {
-		fmt.Println("ERROR", err)
-	} else {
-		fmt.Println(result)
+		fmt.Println("ERROR:: There is an error while creating configmap..")
 	}
 }

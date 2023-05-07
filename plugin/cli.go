@@ -18,8 +18,8 @@ var rootCmd = &cobra.Command{
 }
 
 var mode = &cobra.Command{
-	Use:     "type",
-	Short:   "Type of the checks in cluster",
+	Use:     "mode",
+	Short:   "Mode of the checks in cluster",
 	Aliases: []string{"mode"},
 	Args:    cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
@@ -34,6 +34,8 @@ var mode = &cobra.Command{
 			time.Sleep(50 * time.Second)
 			fmt.Println("Sleeping ... g")
 			gatherLogs("dns-test", "kube-system", clientset)
+			deleteDeployment("dns-deployment", "kube-system", clientset)
+			deleteConfigMap("dns-test-configmap", "kube-system", clientset)
 		}
 	},
 }
