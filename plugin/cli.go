@@ -10,9 +10,9 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "knd",
-	Short: "knd - a simple Kubernetes plugin to gather cluster network dump",
-	Long:  `knd rocking yeaaa :)) `,
+	Use:   "kubectl nd",
+	Short: "kubectl nd - a simple Kubernetes plugin to gather cluster network dump",
+	Long:  `kubectl nd rocking yeaaa :)) `,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println(args[0])
 	},
