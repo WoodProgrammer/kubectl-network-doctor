@@ -49,7 +49,7 @@ func gatherLogs(deploymentLabel string, namespaceName string, clientset *kuberne
 	}
 }
 
-func deleteDeployment(deploymentName string, namespaceName string, clientset *kubernetes.Clientset) {
+func deleteDeployment(deploymentName string, namespaceName string, stackName string, clientset *kubernetes.Clientset) {
 	deploymentsClient := clientset.AppsV1().Deployments(namespaceName)
 
 	deletePolicy := metav1.DeletePropagationForeground
@@ -58,10 +58,10 @@ func deleteDeployment(deploymentName string, namespaceName string, clientset *ku
 	}); err != nil {
 		panic(err)
 	}
-	fmt.Println("Tearing down dns stack - deployment deleted")
+	fmt.Println("Tearing down %s stack - deployment deleted", stackName)
 }
 
-func createDeployment(deploymentName string, imageName string, command []string, namespaceName string, clientset *kubernetes.Clientset) {
+func createDeployment(deploymentName string, imageName string, command []string, namespaceName string, mountPath string, clientset *kubernetes.Clientset) {
 
 	deploymentsClient := clientset.AppsV1().Deployments("kube-system")
 
@@ -91,7 +91,7 @@ func createDeployment(deploymentName string, imageName string, command []string,
 							VolumeMounts: []corev1.VolumeMount{
 								{
 									Name:      "mnt",
-									MountPath: "/app/hosts.txt",
+									MountPath: mountPath + "/hosts.txt",
 									SubPath:   "hosts.txt",
 								},
 							},
