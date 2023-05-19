@@ -64,6 +64,23 @@ var mode = &cobra.Command{
 			deleteDeployment("traceroute-deployment", "kube-system", "traceroute-stack", clientset)
 			deleteConfigMap("traceroute-test-configmap", "kube-system", clientset)
 
+		} else if args[0] == "tcpdump" {
+
+			targetPodName := args[1]
+			fmt.Println(targetPodName)
+			containerName := createDebugContainer("kube-system", clientset)
+
+			fmt.Println(containerName)
+
+			fmt.Println("INFO:::Waiting for the debug containers get ready ....")
+			bar := progressbar.Default(50)
+			for i := 0; i < 50; i++ {
+				bar.Add(1)
+				time.Sleep(1 * time.Second)
+			}
+
+			ExecuteRemoteCommand("tcpdump -i eth0 -U -w -", "dump-file-test.pcap", "kube-system", targetPodName, "debugger-ilfz")
+
 		}
 	},
 }
