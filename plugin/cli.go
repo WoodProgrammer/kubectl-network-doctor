@@ -78,6 +78,10 @@ var mode = &cobra.Command{
 				bar.Add(1)
 				time.Sleep(1 * time.Second)
 			}
+			// TODO::
+			// Time out value for tcpdump
+			// pcap for labeled pods
+			// count for them
 
 			ExecuteRemoteCommand("tcpdump -i eth0 -U -w -", "dump-file-test.pcap", "kube-system", targetPodName, "debugger-ilfz")
 
