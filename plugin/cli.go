@@ -92,6 +92,9 @@ var mode = &cobra.Command{
 }
 
 func Execute() {
+
+	fmt.Println("Kubectl network doctor -- version 0.0.1 -- DEMO version ")
+
 	rootCmd.AddCommand(mode)
 	mode.PersistentFlags().String("pod", "", "This is the target pod name for tcpdump mode")
 	mode.PersistentFlags().String("file", "", "This is the path for the outputs of tcpdump mode")
