@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"io"
 	"log"
 
@@ -29,7 +28,7 @@ func getPodLogs(clientset *kubernetes.Clientset) {
 		req := clientset.CoreV1().Pods("kube-system").GetLogs(pod.Name, &podLogOpts)
 		podLogs, err := req.Stream(context.TODO())
 		if err != nil {
-			fmt.Println(err)
+			ErrorLogger.Println(err)
 			log.Fatal("error in opening stream")
 		}
 
@@ -41,7 +40,7 @@ func getPodLogs(clientset *kubernetes.Clientset) {
 			log.Fatal("")
 		}
 		str := buf.String()
-		fmt.Println(str)
+		InfoLogger.Println(str)
 	}
 
 }

@@ -1,12 +1,23 @@
 package main
 
 import (
+	"log"
 	"math/rand"
+	"os"
 	"time"
+)
+
+var (
+	WarningLogger *log.Logger
+	InfoLogger    *log.Logger
+	ErrorLogger   *log.Logger
 )
 
 func init() {
 	rand.Seed(time.Now().UnixNano())
+	InfoLogger = log.New(os.Stdout, "INFO: ", log.Ldate|log.Ltime)
+	WarningLogger = log.New(os.Stdout, "WARNING: ", log.Ldate|log.Ltime)
+	ErrorLogger = log.New(os.Stdout, "ERROR: ", log.Ldate|log.Ltime)
 }
 
 var letterRunes = []rune("abcdefghijklmnopqrstuvwxyz")

@@ -35,7 +35,7 @@ func createDebugContainer(namespaceName string, targetPodName string, clientset 
 	_, err := clientset.CoreV1().Pods(pod.Namespace).UpdateEphemeralContainers(context.TODO(), pod.Name, pod, metav1.UpdateOptions{})
 
 	if err != nil {
-		fmt.Println(err)
+		ErrorLogger.Println(err)
 	}
 
 	return debugContainerName

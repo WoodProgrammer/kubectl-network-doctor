@@ -33,7 +33,7 @@ func gatherLogs(deploymentKey string, deploymentValue string, namespaceName stri
 		req := clientset.CoreV1().Pods(namespaceName).GetLogs(pod.Name, &podLogOpts)
 		podLogs, err := req.Stream(context.TODO())
 		if err != nil {
-			fmt.Println(err)
+			InfoLogger.Println(err)
 			log.Fatal("error in opening stream")
 		}
 
@@ -45,7 +45,7 @@ func gatherLogs(deploymentKey string, deploymentValue string, namespaceName stri
 			log.Fatal("")
 		}
 		str := buf.String()
-		fmt.Println(str)
+		InfoLogger.Println(str)
 	}
 }
 
@@ -58,21 +58,21 @@ func deleteDeployment(deploymentName string, namespaceName string, stackName str
 	}); err != nil {
 		panic(err)
 	}
-	fmt.Println("Tearing down %s stack - deployment deleted", stackName)
+	InfoLogger.Println("Tearing down %s stack - deployment deleted", stackName)
 }
 
 func getDeployment(deploymentName string, namespaceName string, clientset *kubernetes.Clientset) {
 
-	fmt.Println("The Replica status of core-dns pods under kube-system")
+	InfoLogger.Println("The Replica status of core-dns pods under kube-system")
 	deploymentsClient := clientset.AppsV1().Deployments(namespaceName)
 
 	result, err := deploymentsClient.Get(context.TODO(), deploymentName, metav1.GetOptions{})
 
 	if err != nil {
-		fmt.Printf("ERROR:: Gathering %s deployment status \n", err)
+		ErrorLogger.Println("ERROR:: Gathering %s deployment status \n", err)
 	} else {
-		fmt.Println("INFO:: Desired Replicas of ::", deploymentName, *result.Spec.Replicas)
-		fmt.Println("INFO:: Available Replicas of ::", deploymentName, result.Status.AvailableReplicas)
+		InfoLogger.Println("INFO:: Desired Replicas of ::", deploymentName, *result.Spec.Replicas)
+		InfoLogger.Println("INFO:: Available Replicas of ::", deploymentName, result.Status.AvailableReplicas)
 	}
 }
 

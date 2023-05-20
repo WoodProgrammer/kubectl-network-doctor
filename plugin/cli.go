@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 	"time"
 
@@ -14,7 +13,7 @@ var rootCmd = &cobra.Command{
 	Short: "kubectl nd - a simple Kubernetes plugin to gather cluster network dump",
 	Long:  `kubectl nd rocking yeaaa :)) `,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println(args[0])
+		InfoLogger.Println(args[0])
 	},
 }
 
@@ -36,13 +35,13 @@ var mode = &cobra.Command{
 		if args[0] == "dns" {
 			getDeployment("coredns", "kube-system", clientset)
 
-			fmt.Println("INFO:: Gathering CoreDNS Logs")
+			InfoLogger.Println("Gathering CoreDNS Logs")
 			gatherLogs("k8s-app", "kube-dns", "kube-system", clientset) //coredns Logs
 
 			createConfigMap("dns-test-configmap", "kube-system", data, clientset)
 			createDeployment("dns", "emirozbir/dns-func-test:0.0.1", command, "kube-system", "/app", clientset)
 
-			fmt.Println("INFO:::Waiting for the results of the logs until the DnsTester deployment get ready approx:: 50 sec")
+			InfoLogger.Println("Waiting for the results of the logs until the DnsTester deployment get ready approx:: 50 sec")
 			bar := progressbar.Default(50)
 			for i := 0; i < 50; i++ {
 				bar.Add(1)
@@ -57,7 +56,7 @@ var mode = &cobra.Command{
 
 			createConfigMap("traceroute-test-configmap", "kube-system", data, clientset)
 			createDeployment("traceroute", "emirozbir/traceroute-test:0.0.1", trCommand, "kube-system", "/opt/traceroute", clientset)
-			fmt.Println("INFO:::Waiting for the results of the logs until the TraceRoute deployment get ready approx:: 50 sec")
+			InfoLogger.Println("Waiting for the results of the logs until the TraceRoute deployment get ready approx:: 50 sec")
 			bar := progressbar.Default(50)
 			for i := 0; i < 50; i++ {
 				bar.Add(1)
@@ -69,13 +68,13 @@ var mode = &cobra.Command{
 
 		} else if args[0] == "tcpdump" {
 
-			fmt.Println(targetPodName)
+			InfoLogger.Println(targetPodName)
 
 			containerName := createDebugContainer(targetNamespace, targetPodName, clientset)
 
-			fmt.Println(containerName)
+			InfoLogger.Println("Debug logger%s", containerName)
 
-			fmt.Println("INFO:::Waiting for the debug containers get ready ....")
+			InfoLogger.Println("Waiting for the debug containers get ready ....")
 			bar := progressbar.Default(50)
 			for i := 0; i < 50; i++ {
 				bar.Add(1)
@@ -94,15 +93,13 @@ var mode = &cobra.Command{
 
 func Execute() {
 
-	fmt.Println("Kubectl network doctor -- version 0.0.1 -- DEMO version ")
-
 	rootCmd.AddCommand(mode)
 	mode.PersistentFlags().String("pod", "", "This is the target pod name for tcpdump mode")
 	mode.PersistentFlags().String("file", "", "This is the path for the outputs of tcpdump mode")
 	mode.PersistentFlags().String("namespace", "", "This is identifier flag for the tcpdump mode")
 
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Fprintf(os.Stderr, "Whoops. There was an error while executing your CLI '%s'", err)
+		ErrorLogger.Println(os.Stderr, "Whoops. There was an error while executing your CLI '%s'", err)
 		os.Exit(1)
 	}
 }

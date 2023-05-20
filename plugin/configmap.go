@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -30,11 +29,11 @@ func generateHostsFile(fileName string) map[string]string {
 	configMap := make(map[string]string)
 
 	if _, err := os.Stat(fileName); err == nil {
-		fmt.Println("The file is exist:: %s", fileName)
+		InfoLogger.Println("The file is exist:: %s", fileName)
 		configMap["hosts.txt"] = readHostList(fileName)
 
 	} else {
-		fmt.Println("The file %s is not exist in generating with default addresses", fileName)
+		WarningLogger.Println("The file %s is not exist in generating with default addresses", fileName)
 		configMap["hosts.txt"] = "www.youtube.com\nwww.google.com\nifconfig.co"
 
 	}
@@ -47,7 +46,7 @@ func deleteConfigMap(configMapName string, namespaceName string, clientset *kube
 
 	result := clientset.CoreV1().ConfigMaps("kube-system").Delete(context.TODO(), configMapName, metav1.DeleteOptions{})
 
-	fmt.Println("Tearing down dns stack - deployment deleted %s", result)
+	WarningLogger.Println("Tearing down dns stack - deployment deleted %s", result)
 
 }
 
@@ -68,6 +67,6 @@ func createConfigMap(configMapName string, namespaceName string, data map[string
 	err, _ := clientset.CoreV1().ConfigMaps("kube-system").Create(context.TODO(), &cm, metav1.CreateOptions{})
 
 	if err != nil {
-		fmt.Println("ERROR:: There is an error while creating configmap..")
+		ErrorLogger.Println("There is an error while creating configmap..")
 	}
 }
