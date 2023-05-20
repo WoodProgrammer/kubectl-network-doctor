@@ -16,14 +16,15 @@ popd
 
 ```
 
-# USAGE
+# USAGE
 
 kubectl-network-doctor basically provides three module just for now;
 * coredns (status/logs)
 * traceroute & dns resolution tests
 * tcpdump with debug containers
 
-## coredns mode 
+## coredns mode 
+
 It basically check status of coredns replicas and logs.After this operation done, kubectl-nd creates one deployment with the name `dns-test`.
 
 This deployment object run a simple pod which runs and measure the dns records which are already initalizated on `hosts.txt` file.
@@ -56,6 +57,7 @@ www.google.com
 ```
 
 ## traceroute mode 
+
 The traceroute mode run traceroute command and it shows the trace outputs in hosts.txt file.
 
 ```sh
@@ -79,7 +81,8 @@ The traceroute mode run traceroute command and it shows the trace outputs in hos
     .......
 
 ```
-## tcpdump mode 
+## tcpdump mode
+
 Let's check the tcpdump usage.In this mode it basically creates debug container in specified pod.
 
 <b>Caveats</b>
@@ -87,7 +90,7 @@ Let's check the tcpdump usage.In this mode it basically creates debug container 
 If you would like to run tcpdump mode please be ensure `EphemeralContainers` flags enabled on your cluster.
 
 ```sh
-    kubectl nd mode tcpdump --pod target-pod-name --namespace kube-system --file test.pcap
+    kubectl nd mode tcpdump --pod target-pod-name --namespace kube-system --file target-pod-$DATE.pcap
 ```
 
 If you do not specify name of the file, kubectl-nd creates default file by the date prefix.
