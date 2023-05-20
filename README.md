@@ -2,14 +2,6 @@
 
 kubectl network doctor helps you to identify reason of the Kubernetes networking problems like DNS, east-west and south-north traffic communication.
 
-This creates a dump of the network components in Kubernetes cluster.
-
-
-# Demo
-
-<img src="img/movie.gif"></img>
-
-
 # Build from Scratch
 
 This plugin has very simple installation method basically you just need to move this script somewhere in the output of the `$PATH` output on your local.
