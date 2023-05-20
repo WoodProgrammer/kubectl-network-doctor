@@ -16,7 +16,7 @@ popd
 
 ```
 
-# USAGE
+# USAGE
 
 kubectl-network-doctor basically provides three module just for now;
 * coredns (status/logs)
