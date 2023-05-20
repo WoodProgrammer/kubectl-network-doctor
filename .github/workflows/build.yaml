@@ -2,8 +2,8 @@ name: Release Go project
 
 on:
   push:
-    branch:
-      - "go-release-pipeline"
+    tags:
+      - "*"
 
 jobs:
   build:
