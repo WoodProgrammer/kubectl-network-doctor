@@ -27,6 +27,6 @@ func init() {
 }
 
 func main() {
-	println(Yellow + "Kubectl Network Doctor version 0.0.1")
+	println(Yellow + "Kubectl Network Doctor version 0.0.1" + Reset)
 	Execute()
 }
