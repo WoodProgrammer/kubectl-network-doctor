@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"time"
 
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes"
@@ -30,10 +31,19 @@ func ExecuteRemoteCommand(command string, tcpDumpFileName string, namespaceName 
 	var fileWriter io.Writer
 
 	if tcpDumpFileName != "" {
-		fileWriter, err = os.Create("tcpdump-file.pcap")
+		fileWriter, err = os.Create(tcpDumpFileName)
 
 	} else {
-		fileWriter, err = os.Create(tcpDumpFileName)
+		currentTime := time.Now()
+		defaultFilePrefix := fmt.Sprintf("%d-%d-%d-%d-%d-%d-tcpdump.pcap\n",
+			currentTime.Year(),
+			currentTime.Month(),
+			currentTime.Day(),
+			currentTime.Hour(),
+			currentTime.Hour(),
+			currentTime.Second())
+
+		fileWriter, err = os.Create(defaultFilePrefix)
 	}
 
 	buf := &bytes.Buffer{}

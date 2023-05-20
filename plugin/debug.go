@@ -16,11 +16,11 @@ func generateRandomContainerName() string {
 	return containerName
 }
 
-func createDebugContainer(namespaceName string, clientset *kubernetes.Clientset) string {
+func createDebugContainer(namespaceName string, targetPodName string, clientset *kubernetes.Clientset) string {
 	debugContainerName := generateRandomContainerName()
 
 	command := []string{"sleep", "10000000000"}
-	pod, _ := clientset.CoreV1().Pods(namespaceName).Get(context.TODO(), "coredns-64897985d-r99fw", metav1.GetOptions{})
+	pod, _ := clientset.CoreV1().Pods(namespaceName).Get(context.TODO(), targetPodName, metav1.GetOptions{})
 
 	ec := coreV1.EphemeralContainer{
 		EphemeralContainerCommon: coreV1.EphemeralContainerCommon{

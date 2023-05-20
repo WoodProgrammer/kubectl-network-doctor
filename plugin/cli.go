@@ -22,8 +22,10 @@ var mode = &cobra.Command{
 	Use:     "mode",
 	Short:   "Mode of the checks in cluster",
 	Aliases: []string{"mode"},
-	Args:    cobra.ExactArgs(1),
+	//Args:    cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
+		targetPodName, _ := cmd.Flags().GetString("pod")
+		outputLocation, _ := cmd.Flags().GetString("file")
 
 		command := []string{"./main"}
 		trCommand := []string{"./main.sh"}
@@ -66,9 +68,9 @@ var mode = &cobra.Command{
 
 		} else if args[0] == "tcpdump" {
 
-			targetPodName := args[1]
 			fmt.Println(targetPodName)
-			containerName := createDebugContainer("kube-system", clientset)
+
+			containerName := createDebugContainer("kube-system", targetPodName, clientset)
 
 			fmt.Println(containerName)
 
@@ -83,7 +85,7 @@ var mode = &cobra.Command{
 			// pcap for labeled pods
 			// count for them
 
-			ExecuteRemoteCommand("tcpdump -i eth0 -U -w -", "dump-file-test.pcap", "kube-system", targetPodName, "debugger-ilfz")
+			ExecuteRemoteCommand("tcpdump -i eth0 -U -w -", outputLocation, "kube-system", targetPodName, containerName)
 
 		}
 	},
@@ -91,6 +93,9 @@ var mode = &cobra.Command{
 
 func Execute() {
 	rootCmd.AddCommand(mode)
+	mode.PersistentFlags().String("pod", "", "This is the target pod name for tcpdump mode")
+	mode.PersistentFlags().String("file", "", "This is the path for the outputs of tcpdump mode")
+
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintf(os.Stderr, "Whoops. There was an error while executing your CLI '%s'", err)
 		os.Exit(1)
