@@ -27,7 +27,7 @@ var mode = &cobra.Command{
 		outputLocation, _ := cmd.Flags().GetString("file")
 		targetNamespace, _ := cmd.Flags().GetString("namespace")
 
-		command := []string{"./main"}
+		command := []string{"/bin/bash", "-c", "/opt/main"}
 		trCommand := []string{"./main.sh"}
 		clientset := configHandler()
 		data := generateHostsFile("hosts.txt")
@@ -39,7 +39,9 @@ var mode = &cobra.Command{
 			gatherLogs("k8s-app", "kube-dns", "kube-system", clientset) //coredns Logs
 
 			createConfigMap("dns-test-configmap", "kube-system", data, clientset)
-			createDeployment("dns", "emirozbir/dns-func-test:0.0.1", command, "kube-system", "/app", clientset)
+			createDeployment("dns", "emirozbir/dns-func-test:0.0.2", command, "kube-system", "/opt", clientset)
+
+			getDeployment("dns-deployment", "kube-system", clientset)
 
 			InfoLogger.Println("Waiting for the results of the logs until the DnsTester deployment get ready approx:: 50 sec")
 			bar := progressbar.Default(50)
@@ -80,10 +82,6 @@ var mode = &cobra.Command{
 				bar.Add(1)
 				time.Sleep(1 * time.Second)
 			}
-			// TODO::
-			// Time out value for tcpdump
-			// pcap for labeled pods
-			// count for them
 
 			ExecuteRemoteCommand("tcpdump -i eth0 -U -w -", outputLocation, targetNamespace, targetPodName, containerName)
 

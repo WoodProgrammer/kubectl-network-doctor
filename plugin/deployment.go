@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"io"
 	"log"
 
@@ -61,7 +60,7 @@ func deleteDeployment(deploymentName string, namespaceName string, stackName str
 	InfoLogger.Println("Tearing down %s stack - deployment deleted", stackName)
 }
 
-func getDeployment(deploymentName string, namespaceName string, clientset *kubernetes.Clientset) {
+func getDeployment(deploymentName string, namespaceName string, clientset *kubernetes.Clientset) (int32, int32) {
 
 	InfoLogger.Println("The Replica status of core-dns pods under kube-system")
 	deploymentsClient := clientset.AppsV1().Deployments(namespaceName)
@@ -74,6 +73,8 @@ func getDeployment(deploymentName string, namespaceName string, clientset *kuber
 		InfoLogger.Println("INFO:: Desired Replicas of ::", deploymentName, *result.Spec.Replicas)
 		InfoLogger.Println("INFO:: Available Replicas of ::", deploymentName, result.Status.AvailableReplicas)
 	}
+
+	return result.Status.AvailableReplicas, *result.Spec.Replicas
 }
 
 func createDeployment(deploymentName string, imageName string, command []string, namespaceName string, mountPath string, clientset *kubernetes.Clientset) {
@@ -129,12 +130,12 @@ func createDeployment(deploymentName string, imageName string, command []string,
 		},
 	}
 
-	fmt.Println("Creating deployment...")
+	InfoLogger.Println("Creating deployment...")
 	result, err := deploymentsClient.Create(context.TODO(), deployment, metav1.CreateOptions{})
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("Created deployment %q.\n", result.GetObjectMeta().GetName())
+	InfoLogger.Printf("Created deployment %q.\n", result.GetObjectMeta().GetName())
 }
 
 func int32Ptr(i int32) *int32 { return &i }
